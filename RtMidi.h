@@ -128,6 +128,8 @@ class RTMIDI_DLL_PUBLIC RtMidiError : public std::exception
 typedef void (*RtMidiErrorCallback)( RtMidiError::Type type, const std::string &errorText, void *userData );
 
 class MidiApi;
+class MidiInApi;
+class MidiOutApi;
 
 class RTMIDI_DLL_PUBLIC RtMidi
 {
@@ -209,6 +211,8 @@ class RTMIDI_DLL_PUBLIC RtMidi
   */
   virtual void setErrorCallback( RtMidiErrorCallback errorCallback = NULL, void *userData = 0 ) = 0;
 
+  inline MidiApi * getCurrentApiImpl( void ) { return rtapi_; }
+
  protected:
   RtMidi();
   virtual ~RtMidi();
@@ -279,6 +283,7 @@ class RTMIDI_DLL_PUBLIC RtMidiIn : public RtMidi
 
   //! Returns the MIDI API specifier for the current instance of RtMidiIn.
   RtMidi::Api getCurrentApi( void ) throw();
+  // MidiInApi * getCurrentApiImpl( void ) throw();
 
   //! Open a MIDI input connection given by enumeration number.
   /*!
@@ -408,6 +413,7 @@ class RTMIDI_DLL_PUBLIC RtMidiOut : public RtMidi
 
   //! Returns the MIDI API specifier for the current instance of RtMidiOut.
   RtMidi::Api getCurrentApi( void ) throw();
+  // MidiOutApi * getCurrentApiImpl( void ) throw();
 
   //! Open a MIDI output connection.
   /*!
@@ -603,6 +609,7 @@ class RTMIDI_DLL_PUBLIC MidiOutApi : public MidiApi
 // **************************************************************** //
 
 inline RtMidi::Api RtMidiIn :: getCurrentApi( void ) throw() { return rtapi_->getCurrentApi(); }
+// inline MidiInApi * RtMidiIn :: getCurrentApiImpl( void ) throw() { return static_cast<MidiInApi*>(rtapi_); }
 inline void RtMidiIn :: openPort( unsigned int portNumber, const std::string &portName ) { rtapi_->openPort( portNumber, portName ); }
 inline void RtMidiIn :: openVirtualPort( const std::string &portName ) { rtapi_->openVirtualPort( portName ); }
 inline void RtMidiIn :: closePort( void ) { rtapi_->closePort(); }
@@ -616,6 +623,7 @@ inline double RtMidiIn :: getMessage( std::vector<unsigned char> *message ) { re
 inline void RtMidiIn :: setErrorCallback( RtMidiErrorCallback errorCallback, void *userData ) { rtapi_->setErrorCallback(errorCallback, userData); }
 
 inline RtMidi::Api RtMidiOut :: getCurrentApi( void ) throw() { return rtapi_->getCurrentApi(); }
+// inline MidiOutApi * RtMidiOut :: getCurrentApiImpl( void ) throw() { return rtapi_; }
 inline void RtMidiOut :: openPort( unsigned int portNumber, const std::string &portName ) { rtapi_->openPort( portNumber, portName ); }
 inline void RtMidiOut :: openVirtualPort( const std::string &portName ) { rtapi_->openVirtualPort( portName ); }
 inline void RtMidiOut :: closePort( void ) { rtapi_->closePort(); }

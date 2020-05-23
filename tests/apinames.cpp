@@ -9,10 +9,26 @@
 */
 /******************************************/
 
+
 #include "RtMidi.h"
 #include <cctype>
 #include <cstdlib>
 #include <iostream>
+
+
+#ifdef __APPLE__
+#define __MACOSX_CORE__
+#endif
+
+#ifdef HAS_JACK
+#define __UNIX_JACK__
+#endif
+
+//etc
+
+#include "RtMidi_APIs.h"
+
+
 
 int test_cpp() {
     std::vector<RtMidi::Api> apis;
@@ -32,6 +48,32 @@ int test_cpp() {
             exit(1);
         }
         std::cout << "* " << (int)apis[i] << " '" << name << "': '" << displayName << "'\n";
+
+        MidiApi * midi_api = nullptr;
+        RtMidiIn * midiin = nullptr;
+        try {
+          midiin = new RtMidiIn(apis[i]);
+
+          RtMidi::Api capi = midiin->getCurrentApi();
+
+          #ifdef __APPLE__
+          if (capi == RtMidi::MACOSX_CORE){
+            MidiInCore * midiin_api = dynamic_cast<MidiInCore*>(midiin->getCurrentApiImpl());
+            // etc
+          }
+          #endif /* __APPLE__ */
+          #ifdef __UNIX_JACK__
+          if (capi == RtMidi::UNIX_JACK){
+            MidiInJack * midiin_api = dynamic_cast<MidiInJack*>(midiin->getCurrentApiImpl());
+          }
+          #endif /* __UNIX_JACK__ */
+
+          delete midiin;
+
+        } catch( RtMidiError &error ){
+          error.printMessage();
+        }
+
     }
 
     // ensure unknown APIs return the empty string
